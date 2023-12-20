@@ -18,13 +18,7 @@
  */
 package com.github.mc1arke.sonarqube.plugin.almclient.gitlab;
 
-import com.github.mc1arke.sonarqube.plugin.almclient.gitlab.model.Commit;
-import com.github.mc1arke.sonarqube.plugin.almclient.gitlab.model.Discussion;
-import com.github.mc1arke.sonarqube.plugin.almclient.gitlab.model.MergeRequest;
-import com.github.mc1arke.sonarqube.plugin.almclient.gitlab.model.MergeRequestNote;
-import com.github.mc1arke.sonarqube.plugin.almclient.gitlab.model.PipelineStatus;
-import com.github.mc1arke.sonarqube.plugin.almclient.gitlab.model.Project;
-import com.github.mc1arke.sonarqube.plugin.almclient.gitlab.model.User;
+import com.github.mc1arke.sonarqube.plugin.almclient.gitlab.model.*;
 
 import java.io.IOException;
 import java.util.List;
@@ -47,5 +41,24 @@ public interface GitlabClient {
 
     void setMergeRequestPipelineStatus(long projectId, String commitRevision, PipelineStatus status) throws IOException;
 
+    /**
+     * Create a draft note
+     * {@link } <a href="https://docs.gitlab.com/ee/api/draft_notes.html#create-a-draft-note">docs.gitlab</a>
+     * @param projectId
+     * @param mergeRequestIid
+     * @param mergeRequestNote
+     */
+    DraftNote addMergeRequestDraftNotes(long projectId, long mergeRequestIid, MergeRequestNote mergeRequestNote) throws IOException;
+
+    /**
+     * Publish all pending draft notes
+     * {@link } <a href="https://docs.gitlab.com/ee/api/draft_notes.html#publish-all-pending-draft-notes">docs.gitlab</a>
+     * @param projectId
+     * @param mergeRequestIid
+     */
+    void publishAllPendingDraftNotes(long projectId, long mergeRequestIid) throws IOException;
+
     Project getProject(String projectSlug) throws IOException;
+
+
 }

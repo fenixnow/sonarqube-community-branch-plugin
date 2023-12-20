@@ -20,14 +20,7 @@ package com.github.mc1arke.sonarqube.plugin.almclient.gitlab;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.mc1arke.sonarqube.plugin.almclient.LinkHeaderReader;
-import com.github.mc1arke.sonarqube.plugin.almclient.gitlab.model.Commit;
-import com.github.mc1arke.sonarqube.plugin.almclient.gitlab.model.CommitNote;
-import com.github.mc1arke.sonarqube.plugin.almclient.gitlab.model.Discussion;
-import com.github.mc1arke.sonarqube.plugin.almclient.gitlab.model.MergeRequest;
-import com.github.mc1arke.sonarqube.plugin.almclient.gitlab.model.MergeRequestNote;
-import com.github.mc1arke.sonarqube.plugin.almclient.gitlab.model.PipelineStatus;
-import com.github.mc1arke.sonarqube.plugin.almclient.gitlab.model.Project;
-import com.github.mc1arke.sonarqube.plugin.almclient.gitlab.model.User;
+import com.github.mc1arke.sonarqube.plugin.almclient.gitlab.model.*;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -157,6 +150,42 @@ class GitlabRestClient implements GitlabClient {
                 validateResponse(httpResponse, 201, "Comment posted");
             }
         });
+    }
+
+    @Override
+    public DraftNote addMergeRequestDraftNotes(long projectId, long mergeRequestIid, MergeRequestNote mergeRequestNote) throws IOException {
+        String targetUrl = String.format("%s/projects/%s/merge_requests/%s/draft_notes", baseGitlabApiUrl, projectId, mergeRequestIid);
+
+        List<NameValuePair> requestContent = new ArrayList<>();
+        requestContent.add(new BasicNameValuePair("body", mergeRequestNote.getContent()));
+
+        if (mergeRequestNote instanceof CommitNote) {
+            CommitNote commitNote = (CommitNote) mergeRequestNote;
+            requestContent.addAll(Arrays.asList(
+                    new BasicNameValuePair("position[base_sha]", commitNote.getBaseSha()),
+                    new BasicNameValuePair("position[start_sha]", commitNote.getStartSha()),
+                    new BasicNameValuePair("position[head_sha]", commitNote.getHeadSha()),
+                    new BasicNameValuePair("position[old_path]", commitNote.getOldPath()),
+                    new BasicNameValuePair("position[new_path]", commitNote.getNewPath()),
+                    new BasicNameValuePair("position[new_line]", String.valueOf(commitNote.getNewLine())),
+                    new BasicNameValuePair("position[position_type]", "text"))
+            );
+        }
+        HttpPost httpPost = new HttpPost(targetUrl);
+        httpPost.addHeader("Content-type", ContentType.APPLICATION_FORM_URLENCODED.getMimeType());
+        httpPost.setEntity(new UrlEncodedFormEntity(requestContent, StandardCharsets.UTF_8));
+        return entity(httpPost, DraftNote.class, httpResponse -> validateResponse(httpResponse, 201, "Draft notes successfully created"));
+
+    }
+
+    @Override
+    public void publishAllPendingDraftNotes(long projectId, long mergeRequestIid) throws IOException {
+        String targetUrl = String.format("%s/projects/%s/merge_requests/%s/draft_notes/bulk_publish", baseGitlabApiUrl, projectId, mergeRequestIid);
+
+        HttpPost httpPost = new HttpPost(targetUrl);
+        httpPost.addHeader("Content-type", ContentType.APPLICATION_FORM_URLENCODED.getMimeType());
+
+        entity(httpPost, null, httpResponse -> validateResponse(httpResponse, 201, "All notes successfully published"));
     }
 
     @Override
