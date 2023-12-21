@@ -141,16 +141,40 @@ public class GitlabMergeRequestDecorator extends DiscussionAwarePullRequestDecor
         Integer line = Optional.ofNullable(issue.getIssue().getLine()).orElseThrow(() -> new IllegalStateException("No line is associated with this issue"));
 
         try {
-            client.addMergeRequestDiscussion(mergeRequest.getTargetProjectId(), mergeRequest.getIid(),
+//            client.addMergeRequestDiscussion(mergeRequest.getTargetProjectId(), mergeRequest.getIid(),
+//                    new CommitNote(analysisIssueSummary.format(formatterFactory),
+//                    mergeRequest.getDiffRefs().getBaseSha(),
+//                    mergeRequest.getDiffRefs().getStartSha(),
+//                    mergeRequest.getDiffRefs().getHeadSha(),
+//                    path,
+//                    path,
+//                    line));
+
+            client.addMergeRequestDraftNotes(
+                    mergeRequest.getSourceProjectId(),
+                    mergeRequest.getIid(),
                     new CommitNote(analysisIssueSummary.format(formatterFactory),
-                    mergeRequest.getDiffRefs().getBaseSha(),
-                    mergeRequest.getDiffRefs().getStartSha(),
-                    mergeRequest.getDiffRefs().getHeadSha(),
-                    path,
-                    path,
-                    line));
+                            mergeRequest.getDiffRefs().getBaseSha(),
+                            mergeRequest.getDiffRefs().getStartSha(),
+                            mergeRequest.getDiffRefs().getHeadSha(),
+                            path,
+                            path,
+                            line)
+            );
         } catch (IOException ex) {
             throw new IllegalStateException("Could not submit commit comment to Gitlab", ex);
+        }
+    }
+
+    @Override
+    protected void publishAllPendingDraftNotes(GitlabClient client, MergeRequest mergeRequest) {
+        try {
+            client.publishAllPendingDraftNotes(
+                    mergeRequest.getSourceProjectId(),
+                    mergeRequest.getIid()
+            );
+        } catch (IOException ex) {
+            throw new IllegalStateException("Could not publish commit comment to Gitlab", ex);
         }
     }
 

@@ -170,6 +170,10 @@ public class AzureDevOpsPullRequestDecorator extends DiscussionAwarePullRequestD
         }
     }
 
+    @Override
+    protected void publishAllPendingDraftNotes(AzureDevopsClient client, PullRequest pullRequest) {
+    }
+
 
     @Override
     protected void submitSummaryNote(AzureDevopsClient client, PullRequest pullRequest, AnalysisDetails analysis, AnalysisSummary analysisSummary) {

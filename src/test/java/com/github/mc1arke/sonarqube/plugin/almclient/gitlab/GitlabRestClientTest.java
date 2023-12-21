@@ -11,6 +11,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -30,6 +31,55 @@ class GitlabRestClientTest {
     private final CloseableHttpClient closeableHttpClient = mock(CloseableHttpClient.class);
     private final LinkHeaderReader linkHeaderReader = mock(LinkHeaderReader.class);
     private final ObjectMapper objectMapper = mock(ObjectMapper.class);
+
+    @NotNull
+    private GitlabRestClient testGitlabRestClient() throws IOException {
+
+        CloseableHttpResponse closeableHttpResponse = mock(CloseableHttpResponse.class);
+        StatusLine statusLine = mock(StatusLine.class);
+        when(statusLine.getStatusCode()).thenReturn(201);
+        when(closeableHttpResponse.getStatusLine()).thenReturn(statusLine);
+        HttpEntity httpEntity = mock(HttpEntity.class);
+        when(closeableHttpResponse.getEntity()).thenReturn(httpEntity);
+        when(closeableHttpClient.execute(any())).thenReturn(closeableHttpResponse);
+
+        return new GitlabRestClient("http://api.url", "token", linkHeaderReader, objectMapper, () -> closeableHttpClient);
+    }
+
+    @Test
+    void checkCorrectDraftNote() throws IOException {
+
+        GitlabRestClient client = testGitlabRestClient();
+
+        MergeRequestNote mergeRequestNote = new MergeRequestNote("Draft note");
+
+        client.addMergeRequestDraftNotes(123, 1, mergeRequestNote);
+
+        ArgumentCaptor<HttpUriRequest> requestArgumentCaptor = ArgumentCaptor.forClass(HttpUriRequest.class);
+        verify(closeableHttpClient).execute(requestArgumentCaptor.capture());
+
+        HttpEntityEnclosingRequest request = (HttpEntityEnclosingRequest) requestArgumentCaptor.getValue();
+
+        assertThat(request.getRequestLine().getMethod()).isEqualTo("POST");
+        assertThat(request.getRequestLine().getUri()).isEqualTo("http://api.url/projects/123/merge_requests/1/draft_notes");
+        assertThat(request.getEntity().getContent()).hasContent("body=Draft+note");
+    }
+
+    @Test
+    void checkCorrectRequestPublishDraftNote() throws IOException {
+
+        GitlabRestClient client = testGitlabRestClient();
+
+        client.publishAllPendingDraftNotes(123, 1);
+
+        ArgumentCaptor<HttpUriRequest> requestArgumentCaptor = ArgumentCaptor.forClass(HttpUriRequest.class);
+        verify(closeableHttpClient).execute(requestArgumentCaptor.capture());
+
+        HttpEntityEnclosingRequest request = (HttpEntityEnclosingRequest) requestArgumentCaptor.getValue();
+
+        assertThat(request.getRequestLine().getMethod()).isEqualTo("POST");
+        assertThat(request.getRequestLine().getUri()).isEqualTo("http://api.url/projects/123/merge_requests/1/draft_notes");
+    }
 
     @Test
     void checkErrorThrownOnNonSuccessResponseStatus() throws IOException {

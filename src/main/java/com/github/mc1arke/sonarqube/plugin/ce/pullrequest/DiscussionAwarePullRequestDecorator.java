@@ -101,6 +101,10 @@ public abstract class DiscussionAwarePullRequestDecorator<C, P, U, D, N> impleme
                 analysis,
                 reportGenerator.createAnalysisIssueSummary(issue.getLeft(), analysis)));
 
+        if (!uncommentedIssues.isEmpty()) {
+            publishAllPendingDraftNotes(client, pullRequest);
+        }
+
         AnalysisSummary analysisSummary = reportGenerator.createAnalysisSummary(analysis);
         submitSummaryNote(client, pullRequest, analysis, analysisSummary);
         submitPipelineStatus(client, pullRequest, analysis, analysisSummary);
@@ -125,6 +129,7 @@ public abstract class DiscussionAwarePullRequestDecorator<C, P, U, D, N> impleme
     protected abstract void submitCommitNoteForIssue(C client, P pullRequest, PostAnalysisIssueVisitor.ComponentIssue issue, String filePath,
                                                      AnalysisDetails analysis, AnalysisIssueSummary analysisIssueSummary);
 
+    protected abstract void publishAllPendingDraftNotes(C client, P pullRequest);
     protected abstract String getNoteContent(C client, N note);
 
     protected abstract List<N> getNotesForDiscussion(C client, D discussion);

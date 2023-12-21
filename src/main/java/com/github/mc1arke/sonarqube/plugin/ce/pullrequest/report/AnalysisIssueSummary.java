@@ -94,8 +94,8 @@ public final class AnalysisIssueSummary {
     }
 
     public String format(FormatterFactory formatterFactory) {
-        Long effort = getEffortInMinutes();
-        Node effortNode = (null == effort ? new Text("") : new Paragraph(new Text(String.format("**Duration (min):** %s", effort))));
+//        Long effort = getEffortInMinutes();
+//        Node effortNode = (null == effort ? new Text("") : new Paragraph(new Text(String.format("**Duration (min):** %s", effort))));
 
         Node resolutionNode = (StringUtils.isBlank(getResolution()) ? new Text("") : new Paragraph(new Text(String.format("**Resolution:** %s", getResolution()))));
 
@@ -103,9 +103,9 @@ public final class AnalysisIssueSummary {
                 new Paragraph(new Text(String.format("**Type:** %s ", getType())), new Image(getType(), getTypeImageUrl())),
                 new Paragraph(new Text(String.format("**Severity:** %s ", getSeverity())), new Image(getSeverity(), getSeverityImageUrl())),
                 new Paragraph(new Text(String.format("**Message:** %s", getMessage()))),
-                effortNode,
+//                effortNode,
                 resolutionNode,
-                new Paragraph(new Text(String.format("**Project ID:** %s **Issue ID:** %s", getProjectKey(), getIssueKey()))),
+//                new Paragraph(new Text(String.format("**Project ID:** %s **Issue ID:** %s", getProjectKey(), getIssueKey()))),
                 new Paragraph(new Link(getIssueUrl(), new Text("View in SonarQube")))
         );
 
