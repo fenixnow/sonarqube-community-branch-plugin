@@ -154,10 +154,11 @@ class GitlabRestClient implements GitlabClient {
 
     @Override
     public DraftNote addMergeRequestDraftNotes(long projectId, long mergeRequestIid, MergeRequestNote mergeRequestNote) throws IOException {
+
         String targetUrl = String.format("%s/projects/%s/merge_requests/%s/draft_notes", baseGitlabApiUrl, projectId, mergeRequestIid);
 
         List<NameValuePair> requestContent = new ArrayList<>();
-        requestContent.add(new BasicNameValuePair("body", mergeRequestNote.getContent()));
+        requestContent.add(new BasicNameValuePair("note", mergeRequestNote.getContent()));
 
         if (mergeRequestNote instanceof CommitNote) {
             CommitNote commitNote = (CommitNote) mergeRequestNote;
@@ -171,6 +172,7 @@ class GitlabRestClient implements GitlabClient {
                     new BasicNameValuePair("position[position_type]", "text"))
             );
         }
+
         HttpPost httpPost = new HttpPost(targetUrl);
         httpPost.addHeader("Content-type", ContentType.APPLICATION_FORM_URLENCODED.getMimeType());
         httpPost.setEntity(new UrlEncodedFormEntity(requestContent, StandardCharsets.UTF_8));
