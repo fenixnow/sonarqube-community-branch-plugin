@@ -18,6 +18,7 @@
  */
 package com.github.mc1arke.sonarqube.plugin.ce.pullrequest.gitlab;
 
+import com.github.mc1arke.sonarqube.plugin.CommunityBranchPlugin;
 import com.github.mc1arke.sonarqube.plugin.almclient.gitlab.GitlabClient;
 import com.github.mc1arke.sonarqube.plugin.almclient.gitlab.GitlabClientFactory;
 import com.github.mc1arke.sonarqube.plugin.almclient.gitlab.model.Commit;
@@ -36,6 +37,7 @@ import com.github.mc1arke.sonarqube.plugin.ce.pullrequest.report.AnalysisIssueSu
 import com.github.mc1arke.sonarqube.plugin.ce.pullrequest.report.AnalysisSummary;
 import com.github.mc1arke.sonarqube.plugin.ce.pullrequest.report.ReportGenerator;
 import org.sonar.api.ce.posttask.QualityGate;
+import org.sonar.api.config.Configuration;
 import org.sonar.ce.task.projectanalysis.scm.ScmInfoRepository;
 import org.sonar.db.alm.setting.ALM;
 import org.sonar.db.alm.setting.AlmSettingDto;
@@ -55,11 +57,13 @@ public class GitlabMergeRequestDecorator extends DiscussionAwarePullRequestDecor
 
     private final GitlabClientFactory gitlabClientFactory;
     private final MarkdownFormatterFactory formatterFactory;
+    private final Configuration configuration;
 
-    public GitlabMergeRequestDecorator(ScmInfoRepository scmInfoRepository, GitlabClientFactory gitlabClientFactory, ReportGenerator reportGenerator, MarkdownFormatterFactory formatterFactory) {
+    public GitlabMergeRequestDecorator(ScmInfoRepository scmInfoRepository, GitlabClientFactory gitlabClientFactory, ReportGenerator reportGenerator, MarkdownFormatterFactory formatterFactory, Configuration configuration) {
         super(scmInfoRepository, reportGenerator);
         this.gitlabClientFactory = gitlabClientFactory;
         this.formatterFactory = formatterFactory;
+        this.configuration = configuration;
     }
 
     @Override
@@ -141,26 +145,29 @@ public class GitlabMergeRequestDecorator extends DiscussionAwarePullRequestDecor
         Integer line = Optional.ofNullable(issue.getIssue().getLine()).orElseThrow(() -> new IllegalStateException("No line is associated with this issue"));
 
         try {
-//            client.addMergeRequestDiscussion(mergeRequest.getTargetProjectId(), mergeRequest.getIid(),
-//                    new CommitNote(analysisIssueSummary.format(formatterFactory),
-//                    mergeRequest.getDiffRefs().getBaseSha(),
-//                    mergeRequest.getDiffRefs().getStartSha(),
-//                    mergeRequest.getDiffRefs().getHeadSha(),
-//                    path,
-//                    path,
-//                    line));
+            if (configuration.get(CommunityBranchPlugin.DRAFT_NOTE_ENABLE).map(Boolean::parseBoolean).orElse(false)) {
+                client.addMergeRequestDraftNotes(
+                        mergeRequest.getSourceProjectId(),
+                        mergeRequest.getIid(),
+                        new CommitNote(analysisIssueSummary.format(formatterFactory),
+                                mergeRequest.getDiffRefs().getBaseSha(),
+                                mergeRequest.getDiffRefs().getStartSha(),
+                                mergeRequest.getDiffRefs().getHeadSha(),
+                                path,
+                                path,
+                                line)
+                );
+            } else {
+                client.addMergeRequestDiscussion(mergeRequest.getTargetProjectId(), mergeRequest.getIid(),
+                        new CommitNote(analysisIssueSummary.format(formatterFactory),
+                                mergeRequest.getDiffRefs().getBaseSha(),
+                                mergeRequest.getDiffRefs().getStartSha(),
+                                mergeRequest.getDiffRefs().getHeadSha(),
+                                path,
+                                path,
+                                line));
+            }
 
-            client.addMergeRequestDraftNotes(
-                    mergeRequest.getSourceProjectId(),
-                    mergeRequest.getIid(),
-                    new CommitNote(analysisIssueSummary.format(formatterFactory),
-                            mergeRequest.getDiffRefs().getBaseSha(),
-                            mergeRequest.getDiffRefs().getStartSha(),
-                            mergeRequest.getDiffRefs().getHeadSha(),
-                            path,
-                            path,
-                            line)
-            );
         } catch (IOException ex) {
             throw new IllegalStateException("Could not submit commit comment to Gitlab", ex);
         }

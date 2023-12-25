@@ -99,7 +99,7 @@ public class GitlabMergeRequestDecoratorTest {
     private final MarkdownFormatterFactory markdownFormatterFactory = mock(MarkdownFormatterFactory.class);
     private final AnalysisSummary analysisSummary = mock(AnalysisSummary.class);
 
-    private final GitlabMergeRequestDecorator underTest = new GitlabMergeRequestDecorator(scmInfoRepository, gitlabClientFactory, reportGenerator, markdownFormatterFactory);
+    private final GitlabMergeRequestDecorator underTest = new GitlabMergeRequestDecorator(scmInfoRepository, gitlabClientFactory, reportGenerator, markdownFormatterFactory, null);
 
     @Before
     public void setUp() throws IOException {
