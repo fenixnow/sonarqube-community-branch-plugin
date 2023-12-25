@@ -100,13 +100,13 @@ public final class AnalysisIssueSummary {
         Node resolutionNode = (StringUtils.isBlank(getResolution()) ? new Text("") : new Paragraph(new Text(String.format("**Resolution:** %s", getResolution()))));
 
         Document document = new Document(
-                new Paragraph(new Text(String.format("**Type:** %s ", getType())), new Image(getType(), getTypeImageUrl())),
-                new Paragraph(new Text(String.format("**Severity:** %s ", getSeverity())), new Image(getSeverity(), getSeverityImageUrl())),
-                new Paragraph(new Text(String.format("**Message:** %s", getMessage()))),
+                new Paragraph(new Text(String.format("**Тип:** %s ", getType())), new Image(getType(), getTypeImageUrl())), // Type
+                new Paragraph(new Text(String.format("**Серьезность:** %s ", getSeverity())), new Image(getSeverity(), getSeverityImageUrl())), // Severity
+                new Paragraph(new Text(String.format("**Сообщение:** %s", getMessage()))), // Message
 //                effortNode,
                 resolutionNode,
 //                new Paragraph(new Text(String.format("**Project ID:** %s **Issue ID:** %s", getProjectKey(), getIssueKey()))),
-                new Paragraph(new Link(getIssueUrl(), new Text("View in SonarQube")))
+                new Paragraph(new Link(getIssueUrl(), new Text("Перейти в SonarQube"))) // View in SonarQube
         );
 
         return formatterFactory.documentFormatter().format(document);
