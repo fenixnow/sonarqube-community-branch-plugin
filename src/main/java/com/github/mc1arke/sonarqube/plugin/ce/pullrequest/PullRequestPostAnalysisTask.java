@@ -18,12 +18,12 @@
  */
 package com.github.mc1arke.sonarqube.plugin.ce.pullrequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonar.api.ce.posttask.Analysis;
 import org.sonar.api.ce.posttask.Branch;
 import org.sonar.api.ce.posttask.PostProjectAnalysisTask;
 import org.sonar.api.ce.posttask.QualityGate;
-import org.sonar.api.utils.log.Logger;
-import org.sonar.api.utils.log.Loggers;
 import org.sonar.db.DbClient;
 import org.sonar.db.DbSession;
 import org.sonar.db.alm.setting.ALM;
@@ -38,7 +38,7 @@ import java.util.Optional;
 
 public class PullRequestPostAnalysisTask implements PostProjectAnalysisTask {
 
-    private static final Logger LOGGER = Loggers.get(PullRequestPostAnalysisTask.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PullRequestPostAnalysisTask.class);
 
     private final List<PullRequestBuildStatusDecorator> pullRequestDecorators;
     private final PostAnalysisIssueVisitor postAnalysisIssueVisitor;

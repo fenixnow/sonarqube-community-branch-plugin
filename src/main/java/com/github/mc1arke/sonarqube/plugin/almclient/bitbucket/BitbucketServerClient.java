@@ -19,26 +19,11 @@
 package com.github.mc1arke.sonarqube.plugin.almclient.bitbucket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.mc1arke.sonarqube.plugin.almclient.bitbucket.model.AnnotationUploadLimit;
-import com.github.mc1arke.sonarqube.plugin.almclient.bitbucket.model.CodeInsightsAnnotation;
-import com.github.mc1arke.sonarqube.plugin.almclient.bitbucket.model.CodeInsightsReport;
-import com.github.mc1arke.sonarqube.plugin.almclient.bitbucket.model.DataValue;
-import com.github.mc1arke.sonarqube.plugin.almclient.bitbucket.model.ReportData;
-import com.github.mc1arke.sonarqube.plugin.almclient.bitbucket.model.ReportStatus;
-import com.github.mc1arke.sonarqube.plugin.almclient.bitbucket.model.Repository;
-import com.github.mc1arke.sonarqube.plugin.almclient.bitbucket.model.server.Annotation;
-import com.github.mc1arke.sonarqube.plugin.almclient.bitbucket.model.server.BitbucketServerConfiguration;
-import com.github.mc1arke.sonarqube.plugin.almclient.bitbucket.model.server.CreateAnnotationsRequest;
-import com.github.mc1arke.sonarqube.plugin.almclient.bitbucket.model.server.CreateReportRequest;
-import com.github.mc1arke.sonarqube.plugin.almclient.bitbucket.model.server.ErrorResponse;
-import com.github.mc1arke.sonarqube.plugin.almclient.bitbucket.model.server.ServerProperties;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-import org.sonar.api.utils.log.Logger;
-import org.sonar.api.utils.log.Loggers;
+import com.github.mc1arke.sonarqube.plugin.almclient.bitbucket.model.*;
+import com.github.mc1arke.sonarqube.plugin.almclient.bitbucket.model.server.*;
+import okhttp3.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -50,7 +35,7 @@ import java.util.stream.Collectors;
 import static java.lang.String.format;
 
 class BitbucketServerClient implements BitbucketClient {
-    private static final Logger LOGGER = Loggers.get(BitbucketServerClient.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BitbucketServerClient.class);
     private static final MediaType APPLICATION_JSON_MEDIA_TYPE = MediaType.get("application/json");
     private static final String TITLE = "SonarQube";
     private static final String REPORTER = "SonarQube";

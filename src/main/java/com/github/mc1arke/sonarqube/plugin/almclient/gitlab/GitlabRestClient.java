@@ -32,23 +32,19 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.sonar.api.utils.log.Logger;
-import org.sonar.api.utils.log.Loggers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 class GitlabRestClient implements GitlabClient {
 
-    private static final Logger LOGGER = Loggers.get(GitlabRestClient.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GitlabRestClient.class);
 
     private final String baseGitlabApiUrl;
     private final String authToken;

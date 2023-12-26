@@ -24,25 +24,16 @@ import com.github.mc1arke.sonarqube.plugin.almclient.github.model.Annotation;
 import com.github.mc1arke.sonarqube.plugin.almclient.github.model.CheckRunDetails;
 import com.github.mc1arke.sonarqube.plugin.almclient.github.v4.model.CommentClassifiers;
 import com.github.mc1arke.sonarqube.plugin.almclient.github.v4.model.RequestableCheckStatusState;
-import io.aexp.nodes.graphql.Argument;
-import io.aexp.nodes.graphql.Arguments;
-import io.aexp.nodes.graphql.GraphQLRequestEntity;
-import io.aexp.nodes.graphql.GraphQLResponseEntity;
-import io.aexp.nodes.graphql.GraphQLTemplate;
-import io.aexp.nodes.graphql.InputObject;
+import io.aexp.nodes.graphql.*;
 import io.aexp.nodes.graphql.internal.Error;
-import org.sonar.api.utils.log.Logger;
-import org.sonar.api.utils.log.Loggers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
@@ -50,7 +41,7 @@ import static org.apache.commons.lang.ArrayUtils.isEmpty;
 
 public class GraphqlGithubClient implements GithubClient {
 
-    private static final Logger LOGGER = Loggers.get(GraphqlGithubClient.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GraphqlGithubClient.class);
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX")
             .withZone(ZoneId.of("UTC"));
     private static final String INPUT = "input";

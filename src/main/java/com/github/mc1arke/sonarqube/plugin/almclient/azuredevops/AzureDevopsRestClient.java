@@ -19,16 +19,7 @@
 package com.github.mc1arke.sonarqube.plugin.almclient.azuredevops;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.mc1arke.sonarqube.plugin.almclient.azuredevops.model.CommentThread;
-import com.github.mc1arke.sonarqube.plugin.almclient.azuredevops.model.CommentThreadResponse;
-import com.github.mc1arke.sonarqube.plugin.almclient.azuredevops.model.Commit;
-import com.github.mc1arke.sonarqube.plugin.almclient.azuredevops.model.Commits;
-import com.github.mc1arke.sonarqube.plugin.almclient.azuredevops.model.CreateCommentRequest;
-import com.github.mc1arke.sonarqube.plugin.almclient.azuredevops.model.CreateCommentThreadRequest;
-import com.github.mc1arke.sonarqube.plugin.almclient.azuredevops.model.GitPullRequestStatus;
-import com.github.mc1arke.sonarqube.plugin.almclient.azuredevops.model.PullRequest;
-import com.github.mc1arke.sonarqube.plugin.almclient.azuredevops.model.Repository;
-import com.github.mc1arke.sonarqube.plugin.almclient.azuredevops.model.UpdateCommentThreadStatusRequest;
+import com.github.mc1arke.sonarqube.plugin.almclient.azuredevops.model.*;
 import com.github.mc1arke.sonarqube.plugin.almclient.azuredevops.model.enums.CommentThreadStatus;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.RequestBuilder;
@@ -36,8 +27,8 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
-import org.sonar.api.utils.log.Logger;
-import org.sonar.api.utils.log.Loggers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -49,7 +40,7 @@ import java.util.function.Supplier;
 
 public class AzureDevopsRestClient implements AzureDevopsClient {
 
-    private static final Logger LOGGER = Loggers.get(AzureDevopsRestClient.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AzureDevopsRestClient.class);
     private static final String API_VERSION = "4.1";
     private static final String API_VERSION_PREVIEW = API_VERSION + "-preview";
 

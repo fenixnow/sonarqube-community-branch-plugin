@@ -18,14 +18,9 @@
  */
 package com.github.mc1arke.sonarqube.plugin;
 
-import javassist.CannotCompileException;
-import javassist.ClassPool;
-import javassist.CtClass;
-import javassist.CtConstructor;
-import javassist.CtMethod;
-import javassist.NotFoundException;
-import org.sonar.api.utils.log.Logger;
-import org.sonar.api.utils.log.Loggers;
+import javassist.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonar.core.platform.EditionProvider;
 
 import java.io.IOException;
@@ -39,7 +34,7 @@ import java.util.Optional;
 
 public final class CommunityBranchAgent {
 
-    private static final Logger LOGGER = Loggers.get(CommunityBranchAgent.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommunityBranchAgent.class);
 
     private CommunityBranchAgent() {
         super();

@@ -18,32 +18,26 @@
  */
 package com.github.mc1arke.sonarqube.plugin.scanner;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonar.api.utils.MessageException;
 import org.sonar.api.utils.System2;
-import org.sonar.api.utils.log.Logger;
-import org.sonar.api.utils.log.Loggers;
 import org.sonar.core.config.ScannerProperties;
 import org.sonar.scanner.scan.branch.BranchConfiguration;
 import org.sonar.scanner.scan.branch.BranchConfigurationLoader;
 import org.sonar.scanner.scan.branch.DefaultBranchConfiguration;
 import org.sonar.scanner.scan.branch.ProjectBranches;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
 /**
  * @author Michael Clarke
  */
 public class CommunityBranchConfigurationLoader implements BranchConfigurationLoader {
 
-    private static final Logger LOGGER = Loggers.get(CommunityBranchConfigurationLoader.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommunityBranchConfigurationLoader.class);
 
     private static final Set<String> BRANCH_ANALYSIS_PARAMETERS =
             new HashSet<>(Collections.singletonList(ScannerProperties.BRANCH_NAME));

@@ -20,39 +20,24 @@ package com.github.mc1arke.sonarqube.plugin.almclient.bitbucket;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.mc1arke.sonarqube.plugin.almclient.bitbucket.model.AnnotationUploadLimit;
-import com.github.mc1arke.sonarqube.plugin.almclient.bitbucket.model.BitbucketConfiguration;
-import com.github.mc1arke.sonarqube.plugin.almclient.bitbucket.model.CodeInsightsAnnotation;
-import com.github.mc1arke.sonarqube.plugin.almclient.bitbucket.model.CodeInsightsReport;
-import com.github.mc1arke.sonarqube.plugin.almclient.bitbucket.model.DataValue;
-import com.github.mc1arke.sonarqube.plugin.almclient.bitbucket.model.ReportData;
-import com.github.mc1arke.sonarqube.plugin.almclient.bitbucket.model.ReportStatus;
-import com.github.mc1arke.sonarqube.plugin.almclient.bitbucket.model.Repository;
+import com.github.mc1arke.sonarqube.plugin.almclient.bitbucket.model.*;
 import com.github.mc1arke.sonarqube.plugin.almclient.bitbucket.model.cloud.CloudAnnotation;
 import com.github.mc1arke.sonarqube.plugin.almclient.bitbucket.model.cloud.CloudCreateReportRequest;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-import org.sonar.api.utils.log.Logger;
-import org.sonar.api.utils.log.Loggers;
+import okhttp3.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.Base64;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
 class BitbucketCloudClient implements BitbucketClient {
 
-    private static final Logger LOGGER = Loggers.get(BitbucketCloudClient.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BitbucketCloudClient.class);
     private static final MediaType APPLICATION_JSON_MEDIA_TYPE = MediaType.get("application/json");
     private static final String TITLE = "SonarQube";
     private static final String REPORTER = "SonarQube";
