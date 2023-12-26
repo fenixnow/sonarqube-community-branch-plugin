@@ -11,10 +11,12 @@ before_script:
 
 build:
   stage: build
-  script: gradle --build-cache assemble
+  script: gradle clean assemble
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: push
     paths:
-      - build
       - .gradle
+  artifacts:
+    paths:
+      - build/libs
