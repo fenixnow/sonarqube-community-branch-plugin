@@ -94,18 +94,6 @@ public abstract class DiscussionAwarePullRequestDecorator<C, P, U, D, N> impleme
                 .filter(issue -> isIssueFromCommitInCurrentRequest(issue.getLeft(), commitIds, scmInfoRepository))
                 .collect(Collectors.toList());
 
-//        if (configuration.get(CommunityBranchPlugin.DRAFT_NOTE_ENABLE).map(Boolean::parseBoolean).orElse(false)) {
-//            uncommentedIssues.forEach(issue -> submitDraftNoteForIssue(client,
-//                    pullRequest,
-//                    issue.getLeft(),
-//                    issue.getRight(),
-//                    analysis,
-//                    reportGenerator.createAnalysisIssueSummary(issue.getLeft(), analysis)));
-//
-//            if (!uncommentedIssues.isEmpty()) {
-//                publishAllPendingDraftNotes(client, pullRequest);
-//            }
-//        } else {
             uncommentedIssues.forEach(issue -> submitCommitNoteForIssue(client,
                     pullRequest,
                     issue.getLeft(),
