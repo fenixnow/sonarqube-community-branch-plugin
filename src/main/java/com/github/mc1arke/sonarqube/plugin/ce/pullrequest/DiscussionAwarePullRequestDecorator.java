@@ -104,7 +104,6 @@ public abstract class DiscussionAwarePullRequestDecorator<C, P, U, D, N> impleme
             if (!uncommentedIssues.isEmpty()) {
                 publishAllPendingDraftNotes(client, pullRequest);
             }
-//        }
 
         AnalysisSummary analysisSummary = reportGenerator.createAnalysisSummary(analysis);
         submitSummaryNote(client, pullRequest, analysis, analysisSummary);

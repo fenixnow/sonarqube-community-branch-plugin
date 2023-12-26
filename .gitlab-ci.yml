@@ -1,0 +1,16 @@
+image: jdk17
+
+default:
+  tags:
+    - k8s
+
+build:
+  stage: build
+  script:
+    - ./gradlew assemble
+  artifacts:
+    paths:
+      - build/libs/*.jar
+    expire_in: 1 week
+  only:
+    - master
