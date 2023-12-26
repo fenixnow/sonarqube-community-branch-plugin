@@ -36,6 +36,8 @@ import com.github.mc1arke.sonarqube.plugin.ce.pullrequest.markup.MarkdownFormatt
 import com.github.mc1arke.sonarqube.plugin.ce.pullrequest.report.AnalysisIssueSummary;
 import com.github.mc1arke.sonarqube.plugin.ce.pullrequest.report.AnalysisSummary;
 import com.github.mc1arke.sonarqube.plugin.ce.pullrequest.report.ReportGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonar.api.ce.posttask.QualityGate;
 import org.sonar.api.config.Configuration;
 import org.sonar.ce.task.projectanalysis.scm.ScmInfoRepository;
@@ -50,6 +52,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class GitlabMergeRequestDecorator extends DiscussionAwarePullRequestDecorator<GitlabClient, MergeRequest, User, Discussion, Note> {
+
+    public static final Logger LOGGER = LoggerFactory.getLogger(GitlabMergeRequestDecorator.class);
 
     public static final String PULLREQUEST_GITLAB_PROJECT_URL = "sonar.pullrequest.gitlab.projectUrl";
     public static final String PULLREQUEST_GITLAB_PIPELINE_ID =

@@ -110,6 +110,7 @@ public class CommunityBranchSupportDelegate implements BranchSupportDelegate {
             .setExcludeFromPurge(isBranchExcludedFromPurge(projectConfigurationLoader.loadProjectConfiguration(dbSession, branchDto.getProjectUuid()), branchName))
             .setKey(branchName)
             .setIsMain(false));
+        branchDto.setProjectUuid(mainComponentBranchDto.getProjectUuid());
         dbClient.branchDao().insert(dbSession, branchDto);
 
         return componentDto;

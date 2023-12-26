@@ -183,7 +183,7 @@ class GitlabRestClient implements GitlabClient {
         HttpPost httpPost = new HttpPost(targetUrl);
         httpPost.addHeader("Content-type", ContentType.APPLICATION_FORM_URLENCODED.getMimeType());
 
-        entity(httpPost, null, httpResponse -> validateResponse(httpResponse, 201, "All notes successfully published"));
+        entity(httpPost, null, httpResponse -> validateResponse(httpResponse, 204, "All notes successfully published"));
     }
 
     @Override
