@@ -117,14 +117,14 @@ release {
     }
 }
 
-tasks.jar.configure {
-    classifier = 'nodeps'
-    enabled = false
-}
+//tasks.jar.configure {
+//    classifier = 'nodeps'
+//    enabled = false
+//}
 
-tasks.shadowJar.configure {
-    classifier = null
-}
+//tasks.shadowJar.configure {
+//    classifier = null
+//}
 
 tasks.withType(JavaCompile) {
     options.compilerArgs << '-Xlint:unchecked'
