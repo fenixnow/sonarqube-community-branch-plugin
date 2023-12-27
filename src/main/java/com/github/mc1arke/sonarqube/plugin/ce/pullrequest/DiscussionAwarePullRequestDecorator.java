@@ -94,6 +94,7 @@ public abstract class DiscussionAwarePullRequestDecorator<C, P, U, D, N> impleme
                 .filter(issue -> isIssueFromCommitInCurrentRequest(issue.getLeft(), commitIds, scmInfoRepository))
                 .collect(Collectors.toList());
 
+           // Обрабатываем список замечаний
             uncommentedIssues.forEach(issue -> submitCommitNoteForIssue(client,
                     pullRequest,
                     issue.getLeft(),
@@ -101,12 +102,14 @@ public abstract class DiscussionAwarePullRequestDecorator<C, P, U, D, N> impleme
                     analysis,
                     reportGenerator.createAnalysisIssueSummary(issue.getLeft(), analysis)));
 
-            if (!uncommentedIssues.isEmpty()) {
+            if (!uncommentedIssues.isEmpty() && createDraftNotes()) {
                 publishAllPendingDraftNotes(client, pullRequest);
             }
-
+        // Генерим и отправляем общее сообщение со всем списком в реквест.
         AnalysisSummary analysisSummary = reportGenerator.createAnalysisSummary(analysis);
-        submitSummaryNote(client, pullRequest, analysis, analysisSummary);
+        if (sendSummaryNote()) {
+            submitSummaryNote(client, pullRequest, analysis, analysisSummary);
+        }
         submitPipelineStatus(client, pullRequest, analysis, analysisSummary);
 
         DecorationResult.Builder builder = DecorationResult.builder();
@@ -144,9 +147,13 @@ public abstract class DiscussionAwarePullRequestDecorator<C, P, U, D, N> impleme
 
     protected abstract void submitSummaryNote(C client, P pullRequest, AnalysisDetails analysis, AnalysisSummary analysisSummary);
 
+    protected abstract boolean sendSummaryNote();
+
     protected abstract List<D> getDiscussions(C client, P pullRequest);
 
     protected abstract boolean isNoteFromCurrentUser(N note, U user);
+
+    protected abstract boolean createDraftNotes();
 
     private static List<PostAnalysisIssueVisitor.ComponentIssue> findIssuesWithoutComments(List<PostAnalysisIssueVisitor.ComponentIssue> openSonarqubeIssues,
                                                                                            List<String> openGitlabIssueIdentifiers) {

@@ -105,7 +105,7 @@ public final class AnalysisIssueSummary {
                 new Paragraph(new Text(String.format("**Сообщение:** %s", getMessage()))), // Message
 //                effortNode,
                 resolutionNode,
-//                new Paragraph(new Text(String.format("**Project ID:** %s **Issue ID:** %s", getProjectKey(), getIssueKey()))),
+                new Paragraph(new Text(String.format("**Project ID:** %s **Issue ID:** %s", getProjectKey(), getIssueKey()))),
                 new Paragraph(new Link(getIssueUrl(), new Text("Перейти в SonarQube"))) // View in SonarQube
         );
 

@@ -60,7 +60,7 @@ public class PullRequestPostAnalysisTask implements PostProjectAnalysisTask {
     @Override
     public void finished(Context context) {
         ProjectAnalysis projectAnalysis = context.getProjectAnalysis();
-        LOGGER.debug("Found " + pullRequestDecorators.size() + " pull request decorators");
+        LOGGER.debug("Found {} pull request decorators", pullRequestDecorators.size());
         Optional<Branch> optionalPullRequest =
                 projectAnalysis.getBranch().filter(branch -> Branch.Type.PULL_REQUEST == branch.getType());
         if (optionalPullRequest.isEmpty()) {
@@ -134,12 +134,11 @@ public class PullRequestPostAnalysisTask implements PostProjectAnalysisTask {
                                     postAnalysisIssueVisitor.getIssues(), qualityGate, projectAnalysis);
 
         PullRequestBuildStatusDecorator pullRequestDecorator = optionalPullRequestDecorator.get();
-        LOGGER.info("Using pull request decorator " + pullRequestDecorator.getClass().getName());
+        LOGGER.info("Using pull request decorator {}", pullRequestDecorator.getClass().getName());
         DecorationResult decorationResult = pullRequestDecorator.decorateQualityGateStatus(analysisDetails, almSettingDto, projectAlmSettingDto);
 
         decorationResult.getPullRequestUrl().ifPresent(pullRequestUrl -> persistPullRequestUrl(pullRequestUrl, projectAnalysis, optionalPullRequestId.get()));
     }
-
 
     private static Optional<PullRequestBuildStatusDecorator> findCurrentPullRequestStatusDecorator(
             AlmSettingDto almSetting, List<PullRequestBuildStatusDecorator> pullRequestDecorators) {
@@ -151,7 +150,7 @@ public class PullRequestPostAnalysisTask implements PostProjectAnalysisTask {
             }
         }
 
-        LOGGER.warn("No decorator could be found matching " + alm);
+        LOGGER.warn("No decorator could be found matching {}", alm);
         return Optional.empty();
     }
 

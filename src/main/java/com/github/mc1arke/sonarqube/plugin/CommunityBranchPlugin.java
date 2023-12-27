@@ -73,7 +73,8 @@ import org.sonar.core.extension.CoreExtension;
 public class CommunityBranchPlugin implements Plugin, CoreExtension {
 
     public static final String IMAGE_URL_BASE = "com.github.mc1arke.sonarqube.plugin.branch.image-url-base";
-    public static final String DRAFT_NOTE_ENABLE = "com.github.mc1arke.sonarqube.plugin.branch.draftNote.enable";
+    public static final String DRAFT_NOTE_ENABLED = "sonar.communityBranchPlugin.draftNoteEnabled";
+    public static final String SEND_SUMMARY_NOTE = "sonar.communityBranchPlugin.sendSummaryNote";
 
     @Override
     public String getName() {
@@ -151,12 +152,12 @@ public class CommunityBranchPlugin implements Plugin, CoreExtension {
             context.addExtensions(PropertyDefinition.builder(IMAGE_URL_BASE)
                                           .category(CoreProperties.CATEGORY_GENERAL)
                                           .subCategory(CoreProperties.SUBCATEGORY_GENERAL)
-                                          .onQualifiers(Qualifiers.APP)
+                                          .onQualifiers(Qualifiers.PROJECT)
                                           .name("Images base URL")
                                           .description("Base URL used to load the images for the PR comments (please use this only if images are not displayed properly).")
                                           .type(PropertyType.STRING)
                                           .build(),
-                                PropertyDefinition.builder(DRAFT_NOTE_ENABLE)
+                                PropertyDefinition.builder(DRAFT_NOTE_ENABLED)
                                         .category(CoreProperties.CATEGORY_GENERAL)
                                         .subCategory(CoreProperties.SUBCATEGORY_GENERAL)
                                         .onQualifiers(Qualifiers.APP)
@@ -164,7 +165,14 @@ public class CommunityBranchPlugin implements Plugin, CoreExtension {
                                         .description("Includes drafts of notes in the GitLab request. This is necessary so that the letter receives several entries at a time.")
                                         .type(PropertyType.BOOLEAN)
                                         .build(),
-
+                                PropertyDefinition.builder(SEND_SUMMARY_NOTE)
+                                        .category(CoreProperties.CATEGORY_GENERAL)
+                                        .subCategory(CoreProperties.SUBCATEGORY_GENERAL)
+                                        .onQualifiers(Qualifiers.PROJECT)
+                                        .name("Send summary note")
+                                        .description("При включенной опции, отправляет комментарий с общей информацией по результатам проверки мерж реквеста")
+                                        .type(PropertyType.BOOLEAN)
+                                        .build(),
                 MonoRepoFeature.class);
 
         }

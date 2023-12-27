@@ -180,6 +180,11 @@ public class AzureDevOpsPullRequestDecorator extends DiscussionAwarePullRequestD
         }
     }
 
+    @Override
+    protected boolean sendSummaryNote() {
+        return false;
+    }
+
     protected List<CommentThread> getDiscussions(AzureDevopsClient client, PullRequest pullRequest) {
         try {
             return client.retrieveThreads(pullRequest.getRepository().getProject().getName(), pullRequest.getRepository().getName(), pullRequest.getId());
@@ -191,6 +196,11 @@ public class AzureDevOpsPullRequestDecorator extends DiscussionAwarePullRequestD
     @Override
     protected boolean isNoteFromCurrentUser(Comment note, Void user) {
         return true;
+    }
+
+    @Override
+    protected boolean createDraftNotes() {
+        return false;
     }
 
     @Override

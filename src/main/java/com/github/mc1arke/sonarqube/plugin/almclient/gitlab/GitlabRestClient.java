@@ -85,7 +85,10 @@ class GitlabRestClient implements GitlabClient {
         String targetUrl = String.format("%s/projects/%s/merge_requests/%s/discussions", baseGitlabApiUrl, projectId, mergeRequestIid);
 
         List<NameValuePair> requestContent = new ArrayList<>();
+
         requestContent.add(new BasicNameValuePair("body", mergeRequestNote.getContent()));
+
+        LOGGER.trace("Merge request discussion body - {}", mergeRequestNote.getContent());
 
         if (mergeRequestNote instanceof CommitNote) {
             CommitNote commitNote = (CommitNote) mergeRequestNote;

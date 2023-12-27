@@ -149,7 +149,7 @@ public class GitlabMergeRequestDecorator extends DiscussionAwarePullRequestDecor
         Integer line = Optional.ofNullable(issue.getIssue().getLine()).orElseThrow(() -> new IllegalStateException("No line is associated with this issue"));
 
         try {
-            if (configuration.get(CommunityBranchPlugin.DRAFT_NOTE_ENABLE).map(Boolean::parseBoolean).orElse(false)) {
+            if (createDraftNotes()) {
                 client.addMergeRequestDraftNotes(
                         mergeRequest.getSourceProjectId(),
                         mergeRequest.getIid(),
@@ -201,7 +201,6 @@ public class GitlabMergeRequestDecorator extends DiscussionAwarePullRequestDecor
         } catch (IOException ex) {
             throw new IllegalStateException("Could not submit summary comment to Gitlab", ex);
         }
-
     }
 
     @Override
@@ -216,6 +215,16 @@ public class GitlabMergeRequestDecorator extends DiscussionAwarePullRequestDecor
     @Override
     protected boolean isNoteFromCurrentUser(Note note, User user) {
         return user.getUsername().equals(note.getAuthor().getUsername());
+    }
+
+    @Override
+    protected boolean createDraftNotes() {
+        return configuration.get(CommunityBranchPlugin.DRAFT_NOTE_ENABLED).map(Boolean::parseBoolean).orElse(false);
+    }
+
+    @Override
+    protected boolean sendSummaryNote() {
+        return configuration.get(CommunityBranchPlugin.SEND_SUMMARY_NOTE).map(Boolean::parseBoolean).orElse(false);
     }
 
     @Override
