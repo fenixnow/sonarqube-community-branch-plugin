@@ -48,6 +48,7 @@ import org.sonar.db.alm.setting.ProjectAlmSettingDto;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -113,6 +114,11 @@ public class GitlabMergeRequestDecorator extends DiscussionAwarePullRequestDecor
     }
 
     @Override
+    protected String getAnalysisLanguage() {
+        return configuration.get(CommunityBranchPlugin.ANALYSIS_LANGUAGE_KEY).orElse("en");
+    }
+
+    @Override
     protected List<String> getCommitIdsForPullRequest(GitlabClient gitlabClient, MergeRequest mergeRequest) {
         try {
             return gitlabClient.getMergeRequestCommits(mergeRequest.getTargetProjectId(), mergeRequest.getIid()).stream()
@@ -145,7 +151,7 @@ public class GitlabMergeRequestDecorator extends DiscussionAwarePullRequestDecor
     }
 
     @Override
-    protected void submitCommitNoteForIssue(GitlabClient client, MergeRequest mergeRequest, PostAnalysisIssueVisitor.ComponentIssue issue, String path, AnalysisDetails analysis, AnalysisIssueSummary analysisIssueSummary) {
+    protected void submitCommitNoteForIssue(GitlabClient client, MergeRequest mergeRequest, PostAnalysisIssueVisitor.ComponentIssue issue, String path, AnalysisDetails analysis, AnalysisIssueSummary analysisIssueSummary, String lang) {
         Integer line = Optional.ofNullable(issue.getIssue().getLine()).orElseThrow(() -> new IllegalStateException("No line is associated with this issue"));
 
         try {
@@ -153,7 +159,7 @@ public class GitlabMergeRequestDecorator extends DiscussionAwarePullRequestDecor
                 client.addMergeRequestDraftNotes(
                         mergeRequest.getSourceProjectId(),
                         mergeRequest.getIid(),
-                        new CommitNote(analysisIssueSummary.format(formatterFactory),
+                        new CommitNote(analysisIssueSummary.format(formatterFactory, lang),
                                 mergeRequest.getDiffRefs().getBaseSha(),
                                 mergeRequest.getDiffRefs().getStartSha(),
                                 mergeRequest.getDiffRefs().getHeadSha(),
@@ -163,7 +169,7 @@ public class GitlabMergeRequestDecorator extends DiscussionAwarePullRequestDecor
                 );
             } else {
                 client.addMergeRequestDiscussion(mergeRequest.getTargetProjectId(), mergeRequest.getIid(),
-                        new CommitNote(analysisIssueSummary.format(formatterFactory),
+                        new CommitNote(analysisIssueSummary.format(formatterFactory, lang),
                                 mergeRequest.getDiffRefs().getBaseSha(),
                                 mergeRequest.getDiffRefs().getStartSha(),
                                 mergeRequest.getDiffRefs().getHeadSha(),

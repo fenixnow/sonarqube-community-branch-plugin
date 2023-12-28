@@ -18,14 +18,12 @@
  */
 package com.github.mc1arke.sonarqube.plugin.ce.pullrequest.report;
 
-import com.github.mc1arke.sonarqube.plugin.ce.pullrequest.markup.Document;
-import com.github.mc1arke.sonarqube.plugin.ce.pullrequest.markup.FormatterFactory;
-import com.github.mc1arke.sonarqube.plugin.ce.pullrequest.markup.Image;
-import com.github.mc1arke.sonarqube.plugin.ce.pullrequest.markup.Link;
-import com.github.mc1arke.sonarqube.plugin.ce.pullrequest.markup.Node;
-import com.github.mc1arke.sonarqube.plugin.ce.pullrequest.markup.Paragraph;
-import com.github.mc1arke.sonarqube.plugin.ce.pullrequest.markup.Text;
+import com.github.mc1arke.sonarqube.plugin.CommunityBranchConstants;
+import com.github.mc1arke.sonarqube.plugin.ce.pullrequest.markup.*;
 import org.apache.commons.lang.StringUtils;
+
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 public final class AnalysisIssueSummary {
 
@@ -93,20 +91,25 @@ public final class AnalysisIssueSummary {
         return resolution;
     }
 
-    public String format(FormatterFactory formatterFactory) {
+    public String format(FormatterFactory formatterFactory, String lang) {
+
+        ResourceBundle bundle = ResourceBundle.getBundle("communityBranch", new Locale(lang));
 //        Long effort = getEffortInMinutes();
 //        Node effortNode = (null == effort ? new Text("") : new Paragraph(new Text(String.format("**Duration (min):** %s", effort))));
 
         Node resolutionNode = (StringUtils.isBlank(getResolution()) ? new Text("") : new Paragraph(new Text(String.format("**Resolution:** %s", getResolution()))));
 
         Document document = new Document(
-                new Paragraph(new Text(String.format("**Тип:** %s ", getType())), new Image(getType(), getTypeImageUrl())), // Type
-                new Paragraph(new Text(String.format("**Серьезность:** %s ", getSeverity())), new Image(getSeverity(), getSeverityImageUrl())), // Severity
-                new Paragraph(new Text(String.format("**Сообщение:** %s", getMessage()))), // Message
+                new Paragraph(new Text(String.format("**%s:** %s ", bundle.getString(CommunityBranchConstants.DECORATOR_TYPE), getType())), new Image(getType(), getTypeImageUrl())), // Type
+                new Paragraph(new Text(String.format("**%s:** %s ", bundle.getString(CommunityBranchConstants.DECORATOR_SEVERITY), getSeverity())), new Image(getSeverity(), getSeverityImageUrl())), // Severity
+                new Paragraph(new Text(String.format("**%s:** %s", bundle.getString(CommunityBranchConstants.DECORATOR_MESSAGE), getMessage()))), // Message
 //                effortNode,
                 resolutionNode,
-                new Paragraph(new Text(String.format("**Project ID:** %s **Issue ID:** %s", getProjectKey(), getIssueKey()))),
-                new Paragraph(new Link(getIssueUrl(), new Text("Перейти в SonarQube"))) // View in SonarQube
+                new Paragraph(new Text(String.format("**%s:** %s **%s:** %s",
+                        bundle.getString(CommunityBranchConstants.DECORATOR_PROJECT_ID),
+                        bundle.getString(CommunityBranchConstants.DECORATOR_ISSUE_ID),
+                        getProjectKey(), getIssueKey()))),
+                new Paragraph(new Link(getIssueUrl(), new Text(bundle.getString(CommunityBranchConstants.DECORATOR_VIEW_IN_SONAR)))) // View in SonarQube
         );
 
         return formatterFactory.documentFormatter().format(document);

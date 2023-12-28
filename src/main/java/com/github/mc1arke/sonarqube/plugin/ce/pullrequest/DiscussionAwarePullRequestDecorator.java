@@ -39,6 +39,7 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -69,6 +70,8 @@ public abstract class DiscussionAwarePullRequestDecorator<C, P, U, D, N> impleme
         
         P pullRequest = getPullRequest(client, almSettingDto, projectAlmSettingDto, analysis);
         U user = getCurrentUser(client);
+        String lang = getAnalysisLanguage();
+
         List<PostAnalysisIssueVisitor.ComponentIssue> openSonarqubeIssues = analysis.getScmReportableIssues();
 
         List<Triple<D, N, Optional<ProjectIssueIdentifier>>> currentProjectSonarqubeComments = findOpenSonarqubeComments(client,
@@ -100,7 +103,8 @@ public abstract class DiscussionAwarePullRequestDecorator<C, P, U, D, N> impleme
                     issue.getLeft(),
                     issue.getRight(),
                     analysis,
-                    reportGenerator.createAnalysisIssueSummary(issue.getLeft(), analysis)));
+                    reportGenerator.createAnalysisIssueSummary(issue.getLeft(), analysis),
+                    lang));
 
             if (!uncommentedIssues.isEmpty() && createDraftNotes()) {
                 publishAllPendingDraftNotes(client, pullRequest);
@@ -125,12 +129,13 @@ public abstract class DiscussionAwarePullRequestDecorator<C, P, U, D, N> impleme
 
     protected abstract U getCurrentUser(C client);
 
+    protected abstract String getAnalysisLanguage();
     protected abstract List<String> getCommitIdsForPullRequest(C client, P pullRequest);
 
     protected abstract void submitPipelineStatus(C client, P pullRequest, AnalysisDetails analysis, AnalysisSummary analysisSummary);
 
     protected abstract void submitCommitNoteForIssue(C client, P pullRequest, PostAnalysisIssueVisitor.ComponentIssue issue, String filePath,
-                                                     AnalysisDetails analysis, AnalysisIssueSummary analysisIssueSummary);
+                                                     AnalysisDetails analysis, AnalysisIssueSummary analysisIssueSummary, String lang);
 
     protected abstract void publishAllPendingDraftNotes(C client, P pullRequest);
     protected abstract String getNoteContent(C client, N note);

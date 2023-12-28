@@ -28,18 +28,8 @@ import com.github.mc1arke.sonarqube.plugin.almclient.github.v3.RestApplicationAu
 import com.github.mc1arke.sonarqube.plugin.almclient.github.v4.DefaultGraphqlProvider;
 import com.github.mc1arke.sonarqube.plugin.almclient.gitlab.DefaultGitlabClientFactory;
 import com.github.mc1arke.sonarqube.plugin.ce.CommunityReportAnalysisComponentProvider;
-import com.github.mc1arke.sonarqube.plugin.scanner.BranchConfigurationFactory;
-import com.github.mc1arke.sonarqube.plugin.scanner.CommunityBranchConfigurationLoader;
-import com.github.mc1arke.sonarqube.plugin.scanner.CommunityBranchParamsValidator;
-import com.github.mc1arke.sonarqube.plugin.scanner.CommunityProjectBranchesLoader;
-import com.github.mc1arke.sonarqube.plugin.scanner.ScannerPullRequestPropertySensor;
-import com.github.mc1arke.sonarqube.plugin.scanner.autoconfiguration.AzureDevopsAutoConfigurer;
-import com.github.mc1arke.sonarqube.plugin.scanner.autoconfiguration.BitbucketPipelinesAutoConfigurer;
-import com.github.mc1arke.sonarqube.plugin.scanner.autoconfiguration.CirrusCiAutoConfigurer;
-import com.github.mc1arke.sonarqube.plugin.scanner.autoconfiguration.CodeMagicAutoConfigurer;
-import com.github.mc1arke.sonarqube.plugin.scanner.autoconfiguration.GithubActionsAutoConfigurer;
-import com.github.mc1arke.sonarqube.plugin.scanner.autoconfiguration.GitlabCiAutoConfigurer;
-import com.github.mc1arke.sonarqube.plugin.scanner.autoconfiguration.JenkinsAutoConfigurer;
+import com.github.mc1arke.sonarqube.plugin.scanner.*;
+import com.github.mc1arke.sonarqube.plugin.scanner.autoconfiguration.*;
 import com.github.mc1arke.sonarqube.plugin.server.CommunityBranchFeatureExtension;
 import com.github.mc1arke.sonarqube.plugin.server.CommunityBranchSupportDelegate;
 import com.github.mc1arke.sonarqube.plugin.server.MonoRepoFeature;
@@ -47,17 +37,10 @@ import com.github.mc1arke.sonarqube.plugin.server.pullrequest.validator.AzureDev
 import com.github.mc1arke.sonarqube.plugin.server.pullrequest.validator.BitbucketValidator;
 import com.github.mc1arke.sonarqube.plugin.server.pullrequest.validator.GithubValidator;
 import com.github.mc1arke.sonarqube.plugin.server.pullrequest.validator.GitlabValidator;
-import com.github.mc1arke.sonarqube.plugin.server.pullrequest.ws.binding.action.DeleteBindingAction;
-import com.github.mc1arke.sonarqube.plugin.server.pullrequest.ws.binding.action.SetAzureBindingAction;
-import com.github.mc1arke.sonarqube.plugin.server.pullrequest.ws.binding.action.SetBitbucketBindingAction;
-import com.github.mc1arke.sonarqube.plugin.server.pullrequest.ws.binding.action.SetBitbucketCloudBindingAction;
-import com.github.mc1arke.sonarqube.plugin.server.pullrequest.ws.binding.action.SetGithubBindingAction;
-import com.github.mc1arke.sonarqube.plugin.server.pullrequest.ws.binding.action.SetGitlabBindingAction;
-import com.github.mc1arke.sonarqube.plugin.server.pullrequest.ws.binding.action.ValidateBindingAction;
+import com.github.mc1arke.sonarqube.plugin.server.pullrequest.ws.binding.action.*;
 import com.github.mc1arke.sonarqube.plugin.server.pullrequest.ws.pullrequest.PullRequestWs;
 import com.github.mc1arke.sonarqube.plugin.server.pullrequest.ws.pullrequest.action.DeleteAction;
 import com.github.mc1arke.sonarqube.plugin.server.pullrequest.ws.pullrequest.action.ListAction;
-
 import org.sonar.api.CoreProperties;
 import org.sonar.api.Plugin;
 import org.sonar.api.PropertyType;
@@ -75,6 +58,11 @@ public class CommunityBranchPlugin implements Plugin, CoreExtension {
     public static final String IMAGE_URL_BASE = "com.github.mc1arke.sonarqube.plugin.branch.image-url-base";
     public static final String DRAFT_NOTE_ENABLED = "sonar.communityBranchPlugin.draftNoteEnabled";
     public static final String SEND_SUMMARY_NOTE = "sonar.communityBranchPlugin.sendSummaryNote";
+    public static final String ANALYSIS_LANGUAGE_KEY = "sonar.communityBranchPlugin.language";
+
+    public static final String ANALYSIS_LANGUAGE_DEFAULT_VALUE = "ru";
+
+    public static final String PLUGIN_CATEGORY = "Community Branch";
 
     @Override
     public String getName() {
@@ -149,31 +137,37 @@ public class CommunityBranchPlugin implements Plugin, CoreExtension {
 
         if (SonarQubeSide.COMPUTE_ENGINE == context.getRuntime().getSonarQubeSide() ||
             SonarQubeSide.SERVER == context.getRuntime().getSonarQubeSide()) {
-            context.addExtensions(PropertyDefinition.builder(IMAGE_URL_BASE)
-                                          .category(CoreProperties.CATEGORY_GENERAL)
-                                          .subCategory(CoreProperties.SUBCATEGORY_GENERAL)
-                                          .onQualifiers(Qualifiers.PROJECT)
-                                          .name("Images base URL")
-                                          .description("Base URL used to load the images for the PR comments (please use this only if images are not displayed properly).")
-                                          .type(PropertyType.STRING)
-                                          .build(),
-                                PropertyDefinition.builder(DRAFT_NOTE_ENABLED)
-                                        .category(CoreProperties.CATEGORY_GENERAL)
-                                        .subCategory(CoreProperties.SUBCATEGORY_GENERAL)
-                                        .onQualifiers(Qualifiers.APP)
-                                        .name("Enable GitLab Draft Notes")
-                                        .description("Includes drafts of notes in the GitLab request. This is necessary so that the letter receives several entries at a time.")
-                                        .type(PropertyType.BOOLEAN)
-                                        .build(),
-                                PropertyDefinition.builder(SEND_SUMMARY_NOTE)
-                                        .category(CoreProperties.CATEGORY_GENERAL)
-                                        .subCategory(CoreProperties.SUBCATEGORY_GENERAL)
-                                        .onQualifiers(Qualifiers.PROJECT)
-                                        .name("Send summary note")
-                                        .description("При включенной опции, отправляет комментарий с общей информацией по результатам проверки мерж реквеста")
-                                        .type(PropertyType.BOOLEAN)
-                                        .build(),
-                MonoRepoFeature.class);
+            context.addExtensions(
+                    PropertyDefinition.builder(IMAGE_URL_BASE)
+                            .category(PLUGIN_CATEGORY)
+                            .onQualifiers(Qualifiers.PROJECT)
+                            .name("Images base URL")
+                            .description("Base URL used to load the images for the PR comments (please use this only if images are not displayed properly).")
+                            .type(PropertyType.STRING)
+                            .build(),
+                    PropertyDefinition.builder(DRAFT_NOTE_ENABLED)
+                            .category(PLUGIN_CATEGORY)
+                            .onQualifiers(Qualifiers.APP)
+                            .name("Enable GitLab Draft notes")
+                            .description("Includes drafts of notes in the GitLab request. This is necessary so that the letter receives several entries at a time.")
+                            .type(PropertyType.BOOLEAN)
+                            .build(),
+                    PropertyDefinition.builder(SEND_SUMMARY_NOTE)
+                            .category(PLUGIN_CATEGORY)
+                            .onQualifiers(Qualifiers.PROJECT)
+                            .name("Send summary note")
+                            .description("При включенной опции, отправляет комментарий с общей информацией по результатам проверки мерж реквеста")
+                            .type(PropertyType.BOOLEAN)
+                            .build(),
+                    PropertyDefinition.builder(ANALYSIS_LANGUAGE_KEY)
+                            .category(PLUGIN_CATEGORY)
+                            .onQualifiers(Qualifiers.PROJECT)
+                            .name("Message language")
+                            .description("Определяет на каком языке будут формироваться сообщения")
+                            .options("ru", "en")
+                            .type(PropertyType.SINGLE_SELECT_LIST)
+                            .build(),
+                    MonoRepoFeature.class);
 
         }
     }

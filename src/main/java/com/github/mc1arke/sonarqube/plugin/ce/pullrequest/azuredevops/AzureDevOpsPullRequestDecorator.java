@@ -111,6 +111,11 @@ public class AzureDevOpsPullRequestDecorator extends DiscussionAwarePullRequestD
     }
 
     @Override
+    protected String getAnalysisLanguage() {
+        return "en";
+    }
+
+    @Override
     protected List<String> getCommitIdsForPullRequest(AzureDevopsClient client, PullRequest pullRequest) {
         try {
             return client.getPullRequestCommits(pullRequest.getRepository().getProject().getName(), pullRequest.getRepository().getName(), pullRequest.getId()).stream()
@@ -139,11 +144,11 @@ public class AzureDevOpsPullRequestDecorator extends DiscussionAwarePullRequestD
 
     @Override
     protected void submitCommitNoteForIssue(AzureDevopsClient client, PullRequest pullRequest, PostAnalysisIssueVisitor.ComponentIssue issue, String filePath,
-                                            AnalysisDetails analysis, AnalysisIssueSummary analysisIssueSummary) {
+                                            AnalysisDetails analysis, AnalysisIssueSummary analysisIssueSummary, String lang) {
         DbIssues.Locations location = issue.getIssue().getLocations();
 
         try {
-            CreateCommentRequest comment = new CreateCommentRequest(analysisIssueSummary.format(markdownFormatterFactory));
+            CreateCommentRequest comment = new CreateCommentRequest(analysisIssueSummary.format(markdownFormatterFactory, lang));
             CommentPosition fileStart = new CommentPosition(
                     location.getTextRange().getEndLine(),
                     location.getTextRange().getEndOffset() + 1
