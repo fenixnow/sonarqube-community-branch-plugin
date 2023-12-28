@@ -107,8 +107,9 @@ public final class AnalysisIssueSummary {
                 resolutionNode,
                 new Paragraph(new Text(String.format("**%s:** %s **%s:** %s",
                         bundle.getString(CommunityBranchConstants.DECORATOR_PROJECT_ID),
+                        getProjectKey(),
                         bundle.getString(CommunityBranchConstants.DECORATOR_ISSUE_ID),
-                        getProjectKey(), getIssueKey()))),
+                        getIssueKey()))),
                 new Paragraph(new Link(getIssueUrl(), new Text(bundle.getString(CommunityBranchConstants.DECORATOR_VIEW_IN_SONAR)))) // View in SonarQube
         );
 
