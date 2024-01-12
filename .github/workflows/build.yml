@@ -21,7 +21,7 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       -
         name: Init
         id: init
@@ -45,10 +45,10 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       -
         name: Set up Java ${{ matrix.java }}
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: ${{ matrix.java }}
           java-package: jdk
@@ -68,7 +68,7 @@ jobs:
       -
         name: Archive artifact
         if: success() && matrix.java == '17'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: snapshot
           path: build/libs/*.jar
@@ -80,12 +80,12 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
       -
         name: Set up Java
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: 17
           java-package: jdk
@@ -118,7 +118,7 @@ jobs:
       -
         name: Archive artifact
         if: success()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: release
           path: build/libs/*.jar
@@ -141,12 +141,12 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
       -
         name: Set up Java
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: 17
           java-package: jdk
@@ -160,11 +160,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       -
-        name: Sonar
+        name: Test and Sonar
         if: ${{ env.SONAR_TOKEN != null }}
         run: |
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            ./gradlew sonarqube \
+            ./gradlew test sonar \
+              -Dsonar.gradle.skipCompile=true \
               -Dsonar.pullrequest.provider=github \
               -Dsonar.pullrequest.github.repository=${{ github.repository }} \
               -Dsonar.host.url=https://sonarcloud.io \
@@ -173,7 +174,8 @@ jobs:
               -Dsonar.pullrequest.key=${{ github.event.number }} \
               -Dsonar.pullrequest.base=${{ github.base_ref }}
           elif [ "${{ needs.prep.outputs.release }}" = 'true' ]; then
-            ./gradlew sonarqube \
+            ./gradlew test sonar \
+              -Dsonar.gradle.skipCompile=true \
               -Dsonar.pullrequest.provider=github \
               -Dsonar.pullrequest.github.repository=${{ github.repository }} \
               -Dsonar.host.url=https://sonarcloud.io \
@@ -181,7 +183,8 @@ jobs:
               -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
               -Dsonar.projectVersion=${{ needs.prep.outputs.version }}
           else
-            ./gradlew sonarqube \
+            ./gradlew test sonar \
+              -Dsonar.gradle.skipCompile=true \
               -Dsonar.pullrequest.provider=github \
               -Dsonar.pullrequest.github.repository=${{ github.repository }} \
               -Dsonar.host.url=https://sonarcloud.io \
